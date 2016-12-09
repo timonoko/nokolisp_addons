@@ -1,0 +1,7 @@
+(and
+ (lessp 1 2)
+ (and
+  (lessp 2 3)
+  (and
+   (lessp 3 4)
+   (and (lessp 4 5) (lessp 5 6)))))

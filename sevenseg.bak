@@ -1,0 +1,524 @@
+
+'(%Z%%M% %R%.%L%.%B%.%S% %E% %Y%)
+'(MIKKO-3 (25 / 11 - 2003) (9 : 53 : 6 11))
+(defq *package* SEVENSEG)
+
+(defun tulostaseg ()
+ (koodaa-kirjaimet)
+ (for
+  (b 0 1)
+  (for
+   (x 32 126)
+   (setq y (assoc x segmentit))
+   (print 'RETLW)
+   (sp)
+   (hex t)
+   (print
+    (if y (if (zerop b) (cadr y) (caddr y)) 0))
+   (hex)
+   (print ';)
+   (sp)
+   (printc x)
+   (cr))))
+
+(defq esimerkki
+ ((..... mieleeni muistuu tŽssŽ yhteydessŽ erŽs nuoRuudessani sattunut
+   tapaus, jolloin erŽŽssŽ naapurina olevassa mutta kuitenkin
+   hyvin etŽisessŽ maakunnassa puhkesi yllŽttŽen kapina. en
+   enŽŽ muista sen syitŽ, eivŽtKŽ ne TŽSSŽ YHTEYDESSŽ OLEKAAN
+   TŽRKEITŽ)))
+
+(defun any-sexp (x) (teksti (print-to-list x)))
+
+(defun teksti
+ (x)
+ (unless segmentit (koodaa-kirjaimet))
+ (setq VIIVE 1290)
+ (if (atom x) (setq x (explode x)))
+ (repeat-times
+  (if (> (length x) 8) 10 30)
+  (setq c 0)
+  (mapc x
+   (function
+    (lambda
+     (x2)
+     (if
+      (< c 8)
+      (progn
+       (nayta-kirjain 35 c 1)
+       (nayta-kirjain x2 c)
+       (eval '(repeat-times VIIVE (plus 1 2)))))
+     (setq c (1+ c))))))
+ (if
+  (> (length x) 8)
+  (teksti (cdr x))
+  (segment-17 '(0 0 0))))
+
+(defun demo
+ (x)
+ (koodaa-kirjaimet)
+ (setq c 0)
+ (setq VIIVE 1290)
+ (for
+  (x 32 127)
+  (printc x)
+  (nayta-kirjain 8)
+  (repeat-times 10
+   (for
+    (z 0 7)
+    (nayta-kirjain x z (= z 5))
+    (repeat-times VIIVE (plus 1 2))))
+  (setq c (remainder (1+ c) 10)))
+ (segment-17 '(0 0 0)))
+
+(defun nayta-kirjain
+ (x c p)
+ (unless c (setq c 4))
+ (unless
+  (and (numberp x) (> x 10))
+  (setq x (car (explode x))))
+ (if (< 96 x 123) (setq x (- x 32)))
+ (setq x (case x (40 91) (41 93) (t x)))
+ (setq x (assoc x segmentit))
+ (segment-17
+  (list
+   (if x (cadr x) 0)
+   (if x (caddr x) 0)
+   (logor (logxor 7 c) (if p 248 240)))))
+
+(defun koodaa-kirjaimet ()
+ (setq segmentit
+  (map kirjaimet
+   (function
+    (lambda
+     (x)
+     (setq nolla 0)
+     (setq yksi 0)
+     (mapc
+      (cdr x)
+      (function
+       (lambda
+        (y)
+        (setq bitte 1)
+        (repeat-times (car y) (setq bitte (* 2 bitte)))
+        (if
+         (= (cadr y) 0)
+         (setq nolla (logor bitte nolla))
+         (setq yksi (logor bitte yksi))))))
+     (list (car (explode (car x))) nolla yksi))))))
+
+(defq kirjaimet
+ ((t
+   (4 0)
+   (6 1)
+   (2 1)
+   (3 0)
+   (2 0))
+  (, (4 0))
+  (#
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (4 1)
+   (4 0)
+   (3 0)
+   (3 1)
+   (5 1)
+   (0 0)
+   (6 1)
+   (0 1)
+   (2 1)
+   (1 0)
+   (7 1)
+   (2 0)
+   (1 1))
+  (: (0 1) (3 1))
+  (\ (1 0) (1 1))
+  (?
+   (5 0)
+   (6 0)
+   (7 0)
+   (4 1)
+   (0 1)
+   (2 1))
+  (W
+   (5 0)
+   (4 0)
+   (2 0)
+   (1 1)
+   (5 1)
+   (4 1))
+  ('(7 1))
+  (^ (7 1) (4 1))
+  (_ (3 0) (3 1))
+  (0
+   (2 0)
+   (7 1)
+   (6 0)
+   (7 0)
+   (5 0)
+   (4 1)
+   (4 0)
+   (3 0)
+   (3 1)
+   (5 1))
+  (1 (4 1) (5 1))
+  (2
+   (6 0)
+   (7 0)
+   (4 1)
+   (0 1)
+   (6 1)
+   (4 0)
+   (3 0)
+   (3 1))
+  (3
+   (6 0)
+   (7 0)
+   (4 1)
+   (6 1)
+   (0 1)
+   (5 1)
+   (3 0)
+   (3 1))
+  (4
+   (4 1)
+   (5 0)
+   (6 1)
+   (0 1)
+   (5 1))
+  (5
+   (7 0)
+   (6 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (5 1)
+   (3 1)
+   (3 0))
+  (6
+   (7 0)
+   (6 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (4 0)
+   (3 0)
+   (3 1)
+   (5 1))
+  (7 (6 0) (7 0) (4 1) (5 1))
+  (8
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (4 1)
+   (4 0)
+   (3 0)
+   (3 1)
+   (5 1))
+  (9
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (4 1)
+   (3 0)
+   (3 1)
+   (5 1))
+  ($
+   (0 0)
+   (2 1)
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (3 0)
+   (3 1)
+   (5 1))
+  (*
+   (0 0)
+   (6 1)
+   (0 1)
+   (2 1)
+   (1 0)
+   (7 1)
+   (2 0)
+   (1 1))
+  (+ (0 0) (6 1) (0 1) (2 1))
+  (- (6 1) (0 1))
+  (/ (7 1) (2 0))
+  (< (7 1) (1 1))
+  (> (1 0) (2 0))
+  (™
+   (1 0)
+   (7 1)
+   (6 1)
+   (0 1)
+   (5 1)
+   (3 1)
+   (3 0)
+   (4 0))
+  (Ž
+   (7 0)
+   (2 0)
+   (7 1)
+   (0 1)
+   (4 1)
+   (5 1))
+  (A
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (4 1)
+   (4 0)
+   (5 1))
+  (B
+   (6 0)
+   (7 0)
+   (4 1)
+   (3 0)
+   (3 1)
+   (0 1)
+   (5 1)
+   (0 0)
+   (2 1))
+  (C
+   (6 0)
+   (7 0)
+   (5 0)
+   (4 0)
+   (3 0)
+   (3 1))
+  (D
+   (6 0)
+   (7 0)
+   (4 1)
+   (3 0)
+   (3 1)
+   (5 1)
+   (0 0)
+   (2 1))
+  (E
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (4 0)
+   (3 0)
+   (3 1))
+  (F
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (4 0))
+  (G
+   (6 0)
+   (7 0)
+   (5 0)
+   (0 1)
+   (4 0)
+   (3 0)
+   (3 1)
+   (5 1))
+  (H
+   (5 0)
+   (6 1)
+   (0 1)
+   (4 1)
+   (4 0)
+   (5 1))
+  (I
+   (6 0)
+   (7 0)
+   (0 0)
+   (2 1)
+   (3 0)
+   (3 1))
+  (J
+   (6 0)
+   (7 0)
+   (0 0)
+   (2 1)
+   (3 0)
+   (4 0))
+  (K
+   (5 0)
+   (4 0)
+   (6 1)
+   (7 1)
+   (1 1))
+  (L (5 0) (4 0) (3 0) (3 1))
+  (M
+   (4 0)
+   (5 0)
+   (1 0)
+   (7 1)
+   (4 1)
+   (5 1))
+  (N
+   (5 0)
+   (4 0)
+   (1 0)
+   (1 1)
+   (5 1)
+   (4 1))
+  (O
+   (6 0)
+   (7 0)
+   (5 0)
+   (4 1)
+   (4 0)
+   (3 0)
+   (3 1)
+   (5 1))
+  (P
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (4 1)
+   (4 0))
+  (Q
+   (6 0)
+   (7 0)
+   (5 0)
+   (4 1)
+   (4 0)
+   (3 0)
+   (3 1)
+   (5 1)
+   (1 1))
+  (R
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (4 1)
+   (4 0)
+   (1 1))
+  (S
+   (6 0)
+   (7 0)
+   (5 0)
+   (6 1)
+   (0 1)
+   (3 0)
+   (3 1)
+   (5 1))
+  (T (6 0) (7 0) (0 0) (2 1))
+  (U
+   (5 0)
+   (4 1)
+   (4 0)
+   (3 0)
+   (3 1)
+   (5 1))
+  (V (5 0) (4 0) (2 0) (7 1))
+  (X (1 0) (7 1) (2 0) (1 1))
+  (Y (1 0) (7 1) (2 1))
+  (Z
+   (6 0)
+   (7 0)
+   (7 1)
+   (2 0)
+   (3 0)
+   (3 1))
+  ([ (7 0) (0 0) (2 1) (3 1))
+  (] (6 0) (0 0) (2 1) (3 0))))
+
+(defun segment-17
+ (x)
+ (initialize-serial-port 'COM1 19200 8 'none 1)
+ (send-byte 0)
+ (mapc x segment-17-byte))
+
+(defun segment-17-byte
+ (x)
+ (for
+  (b 0 7)
+  (output-byte modem-control-reg
+   (setq tama-nain (if (zerop (logand x 128)) 2 0)))
+  (output-byte modem-control-reg (logor 1 tama-nain))
+  (output-byte modem-control-reg 0)
+  (setq x (logand 255 (* 2 x)))))
+
+(defun RTS (x) (output-byte modem-control-reg (if x 2 0)))
+
+(defun DTR (x) (output-byte modem-control-reg (if x 1 0)))
+
+(defun taajuus ()
+ (initialize-serial-port 'COM1 2400 8 'none 1)
+ (repeat-times 100
+  (while (zerop (logand 1 (input-byte line-status-reg))) nil)
+  (sp)
+  (setq iik (input-byte base-address))
+  (setq aak 1)
+  (repeat-times 8
+   (print
+    (if (zerop (logand aak iik)) '_ '=))
+   (setq aak (* 2 aak)))))
+
+(defun standard-init () (initialize-serial-port 'COM1 9600 8 'none 1))
+
+(defun send-byte
+ (x)
+ (if
+  (zerop (logand 32 (input-byte line-status-reg)))
+  nil
+  (progn (output-byte base-address x) x)))
+
+(defun byte-received? ()
+ (if (zerop (logand 1 (input-byte line-status-reg))) nil (input-byte base-address)))
+
+(defun initialize-serial-port
+ (port baud-rate word-length parity stop-bits)
+ (setq base-address
+  (peekw 64
+   (case port
+    (COM1 0)
+    (COM2 2)
+    (t
+     (error-reset (list 'NO 'SUCH 'PORT port))))))
+ (setq line-control-reg (+ base-address 3))
+ (setq modem-control-reg (+ base-address 4))
+ (setq line-status-reg (+ base-address 5))
+ (setq modem-status-reg (+ base-address 6))
+ (setq interrupt-enable-register (- line-control-reg 2))
+ (output-byte line-control-reg 128)
+ (setq baud-rate-divisor
+  (/ 1152 (compress (nreverse (cddr (nreverse (explode baud-rate)))))))
+ (output-byte (- line-control-reg 2) (high-byte baud-rate-divisor))
+ (output-byte (- line-control-reg 3) (low-byte baud-rate-divisor))
+ (output-byte line-control-reg
+  (+
+   (case word-length
+    (5 0)
+    (6 1)
+    (7 2)
+    (8 3)
+    (t (error-reset (list 'word-length word-length '?))))
+   (case stop-bits
+    (1 0)
+    (2 4)
+    (t (error-reset (list 'stop-bits stop-bits '?))))
+   (case parity
+    (none 0)
+    (odd 8)
+    (even 24)
+    (t (error-reset (list 'parity parity '?)))))))
+
+(defq SEVENSEG
+ (tulostaseg esimerkki any-sexp teksti demo nayta-kirjain koodaa-kirjaimet
+  kirjaimet segment-17 segment-17-byte RTS DTR taajuus standard-init
+  send-byte byte-received? initialize-serial-port SEVENSEG))
